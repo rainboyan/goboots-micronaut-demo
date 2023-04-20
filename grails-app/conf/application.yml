@@ -141,3 +141,20 @@ environments:
                 testOnReturn: false
                 jdbcInterceptors: ConnectionState
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+---
+spring:
+    datasource:
+        url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+        driverClassName: org.h2.Driver
+        username: sa
+        password: ''
+---
+jpa:
+    default:
+        packages-to-scan:
+            - 'org.rainboyan.demo'
+        properties:
+            hibernate:
+                hbm2ddl:
+                    auto: update
+                show_sql: true
