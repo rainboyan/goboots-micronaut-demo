@@ -6,9 +6,10 @@ buildscript {
         maven { url "https://repo.gradle.org/gradle/libs-releases" }
     }
     dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.15.RELEASE"
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:4.2.0"
-        classpath "gradle.plugin.com.github.erdi.webdriver-binaries:webdriver-binaries-gradle-plugin:2.7"
+        classpath "org.grails.plugins:asset-pipeline-gradle:5.5.0-M4"
+        classpath "com.github.erdi:webdriver-binaries-gradle-plugin:3.2"
     }
 }
 
@@ -19,7 +20,7 @@ apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
 apply plugin:"org.grails.grails-web"
-apply plugin:"com.bertramlabs.asset-pipeline"
+apply plugin:"org.grails.asset-pipeline"
 apply plugin:"com.github.erdi.webdriver-binaries"
 
 repositories {
@@ -28,7 +29,21 @@ repositories {
     maven { url "https://repo.grails.org/grails/core" }
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
+        mavenBom "org.grails:grails-bom:$grailsVersion"
+    }
+}
+
 configurations {
+    all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'io.micronaut' && details.requested.name == 'micronaut-bom') {
+                details.useVersion micronautVersion
+            }
+        }
+    }
     developmentOnly
     runtimeClasspath {
         extendsFrom developmentOnly
@@ -40,13 +55,13 @@ configurations {
 dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     console "org.grails:grails-console"
-    compileOnly "io.micronaut:micronaut-inject-groovy"
-    compileOnly "io.micronaut:micronaut-validation"
-    compileOnly "io.micronaut.groovy:micronaut-runtime-groovy"
-    implementation "io.micronaut.spring:micronaut-spring"
+    compileOnly "io.micronaut:micronaut-inject-groovy:3.10.3"
+    compileOnly "io.micronaut:micronaut-validation:3.10.3"
+    compileOnly "io.micronaut.groovy:micronaut-runtime-groovy:3.4.0"
+    implementation "io.micronaut.spring:micronaut-spring:4.5.1"
     // annotationProcessor("io.micronaut.spring:micronaut-spring-annotation")
     // annotationProcessor "jakarta.persistence:jakarta.persistence-api:2.2.3"
-    implementation "io.micronaut.spring:micronaut-spring-context"
+    implementation "io.micronaut.spring:micronaut-spring-context:4.5.1"
     implementation "jakarta.annotation:jakarta.annotation-api:2.1.1"
     implementation "io.micronaut.sql:micronaut-hibernate-jpa:4.8.1"
     implementation "io.micronaut.sql:micronaut-hibernate-jpa-spring:4.8.1"
@@ -78,12 +93,12 @@ dependencies {
     // implementation "org.grails.plugins:cache"
     // implementation "org.grails.plugins:async"
     // implementation "org.grails.plugins:events"
-    implementation "org.grails.plugins:scaffolding"
+    implementation "org.grails:grails-plugin-scaffolding"
     implementation "org.grails.plugins:fields"
     // implementation "org.grails.plugins:hibernate5"
     // implementation "org.hibernate:hibernate-core:5.6.15.Final"
-    profile "org.grails.profiles:web-bootstrap"
-    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:4.2.0"
+    // profile "org.grails.profiles:web-bootstrap"
+    runtimeOnly "org.grails.plugins:asset-pipeline-grails:5.5.0-M4"
     runtimeOnly "org.glassfish.web:el-impl:2.2.1-b05"
     runtimeOnly "com.h2database:h2"
     runtimeOnly "org.apache.tomcat:tomcat-jdbc"
